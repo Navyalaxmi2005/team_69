@@ -1,0 +1,501 @@
+import cv2
+import numpy as np
+import pyttsx3
+import tensorflow as tf
+
+engine = pyttsx3.init()
+
+model_path = 'D:/project/object/ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8/ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8/saved_model'
+model = tf.saved_model.load(model_path)
+
+model = tf.saved_model.load(model_path)
+
+labels_path = 'D:/project/object/labels.txt'
+with open(labels_path, 'r') as f:
+    labels = f.read().splitlines()
+
+
+cap = cv2.VideoCapture(0)  
+def detect_objects(frame):
+    input_tensor = tf.convert_to_tensor(frame)
+    input_tensor = input_tensor[tf.newaxis, ...]
+
+    detections = model(input_tensor)
+
+    return detections
+
+
+def speak(text):
+    engine.say(text)
+    engine.runAndWait()
+
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    detections = detect_objects(frame)
+
+    detections = detect_objects(frame)
+
+    num_detections = int(detections['num_detections'][0].numpy())
+
+    for i in range(num_detections):  
+        score = detections['detection_scores'][0][i].numpy()  
+        if score > 0.5:  
+            class_id = int(detections['detection_classes'][0][i].numpy())  # Get the class ID
+            label = labels[class_id]
+
+            # Extract the bounding box
+            box = detections['detection_boxes'][0][i].numpy()  # Access the correct box for the detection
+
+            # Unpack the bounding box coordinates
+            ymin, xmin, ymax, xmax = box
+
+            # Scale the box coordinates back to the original image size
+            h, w, _ = frame.shape
+            start_point = (int(xmin * w), int(ymin * h))
+            end_point = (int(xmax * w), int(ymax * h))
+
+            # Draw the bounding box on the frame
+            cv2.rectangle(frame, start_point, end_point, (255, 0, 0), 2)
+            cv2.putText(frame, label, start_point, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+            # Speak the label
+            speak(label)
+
+    # Show the frame
+    cv2.imshow("Object Detection", frame)
+
+    # Quit if 'q' is pressed
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+import re
+
+# Input and output file paths
+input_file = "mscoco_label_map.pbtxt"
+output_file = "labels.txt"
+
+# Initialize an empty list to store labels
+labels = []
+
+# Read the input file and extract labels
+with open(input_file, "r") as f:
+    for line in f:
+        # Match the line containing the label name
+        match = re.search(r'name:\s*"([^"]+)"', line)
+        if match:
+            labels.append(match.group(1))
+
+# Write the labels to a text file, one per line
+with open(output_file, "w") as f:
+    for label in labels:
+        f.write(label + "\n")
+
+print(f"Labels have been saved to {output_file}") 
+#
+item {
+  name: "/m/01g317"
+  id: 1
+  display_name: "person"
+}
+item {
+  name: "/m/0199g"
+  id: 2
+  display_name: "bicycle"
+}
+item {
+  name: "/m/0k4j"
+  id: 3
+  display_name: "car"
+}
+item {
+  name: "/m/04_sv"
+  id: 4
+  display_name: "motorcycle"
+}
+item {
+  name: "/m/05czz6l"
+  id: 5
+  display_name: "airplane"
+}
+item {
+  name: "/m/01bjv"
+  id: 6
+  display_name: "bus"
+}
+item {
+  name: "/m/07jdr"
+  id: 7
+  display_name: "train"
+}
+item {
+  name: "/m/07r04"
+  id: 8
+  display_name: "truck"
+}
+item {
+  name: "/m/019jd"
+  id: 9
+  display_name: "boat"
+}
+item {
+  name: "/m/015qff"
+  id: 10
+  display_name: "traffic light"
+}
+item {
+  name: "/m/01pns0"
+  id: 11
+  display_name: "fire hydrant"
+}
+item {
+  name: "/m/02pv19"
+  id: 13
+  display_name: "stop sign"
+}
+item {
+  name: "/m/015qbp"
+  id: 14
+  display_name: "parking meter"
+}
+item {
+  name: "/m/0cvnqh"
+  id: 15
+  display_name: "bench"
+}
+item {
+  name: "/m/015p6"
+  id: 16
+  display_name: "bird"
+}
+item {
+  name: "/m/01yrx"
+  id: 17
+  display_name: "cat"
+}
+item {
+  name: "/m/0bt9lr"
+  id: 18
+  display_name: "dog"
+}
+item {
+  name: "/m/03k3r"
+  id: 19
+  display_name: "horse"
+}
+item {
+  name: "/m/07bgp"
+  id: 20
+  display_name: "sheep"
+}
+item {
+  name: "/m/01xq0k1"
+  id: 21
+  display_name: "cow"
+}
+item {
+  name: "/m/0bwd_0j"
+  id: 22
+  display_name: "elephant"
+}
+item {
+  name: "/m/01dws"
+  id: 23
+  display_name: "bear"
+}
+item {
+  name: "/m/0898b"
+  id: 24
+  display_name: "zebra"
+}
+item {
+  name: "/m/03bk1"
+  id: 25
+  display_name: "giraffe"
+}
+item {
+  name: "/m/01940j"
+  id: 27
+  display_name: "backpack"
+}
+item {
+  name: "/m/0hnnb"
+  id: 28
+  display_name: "umbrella"
+}
+item {
+  name: "/m/080hkjn"
+  id: 31
+  display_name: "handbag"
+}
+item {
+  name: "/m/01rkbr"
+  id: 32
+  display_name: "tie"
+}
+item {
+  name: "/m/01s55n"
+  id: 33
+  display_name: "suitcase"
+}
+item {
+  name: "/m/02wmf"
+  id: 34
+  display_name: "frisbee"
+}
+item {
+  name: "/m/071p9"
+  id: 35
+  display_name: "skis"
+}
+item {
+  name: "/m/06__v"
+  id: 36
+  display_name: "snowboard"
+}
+item {
+  name: "/m/018xm"
+  id: 37
+  display_name: "sports ball"
+}
+item {
+  name: "/m/02zt3"
+  id: 38
+  display_name: "kite"
+}
+item {
+  name: "/m/03g8mr"
+  id: 39
+  display_name: "baseball bat"
+}
+item {
+  name: "/m/03grzl"
+  id: 40
+  display_name: "baseball glove"
+}
+item {
+  name: "/m/06_fw"
+  id: 41
+  display_name: "skateboard"
+}
+item {
+  name: "/m/019w40"
+  id: 42
+  display_name: "surfboard"
+}
+item {
+  name: "/m/0dv9c"
+  id: 43
+  display_name: "tennis racket"
+}
+item {
+  name: "/m/04dr76w"
+  id: 44
+  display_name: "bottle"
+}
+item {
+  name: "/m/09tvcd"
+  id: 46
+  display_name: "wine glass"
+}
+item {
+  name: "/m/08gqpm"
+  id: 47
+  display_name: "cup"
+}
+item {
+  name: "/m/0dt3t"
+  id: 48
+  display_name: "fork"
+}
+item {
+  name: "/m/04ctx"
+  id: 49
+  display_name: "knife"
+}
+item {
+  name: "/m/0cmx8"
+  id: 50
+  display_name: "spoon"
+}
+item {
+  name: "/m/04kkgm"
+  id: 51
+  display_name: "bowl"
+}
+item {
+  name: "/m/09qck"
+  id: 52
+  display_name: "banana"
+}
+item {
+  name: "/m/014j1m"
+  id: 53
+  display_name: "apple"
+}
+item {
+  name: "/m/0l515"
+  id: 54
+  display_name: "sandwich"
+}
+item {
+  name: "/m/0cyhj_"
+  id: 55
+  display_name: "orange"
+}
+item {
+  name: "/m/0hkxq"
+  id: 56
+  display_name: "broccoli"
+}
+item {
+  name: "/m/0fj52s"
+  id: 57
+  display_name: "carrot"
+}
+item {
+  name: "/m/01b9xk"
+  id: 58
+  display_name: "hot dog"
+}
+item {
+  name: "/m/0663v"
+  id: 59
+  display_name: "pizza"
+}
+item {
+  name: "/m/0jy4k"
+  id: 60
+  display_name: "donut"
+}
+item {
+  name: "/m/0fszt"
+  id: 61
+  display_name: "cake"
+}
+item {
+  name: "/m/01mzpv"
+  id: 62
+  display_name: "chair"
+}
+item {
+  name: "/m/02crq1"
+  id: 63
+  display_name: "couch"
+}
+item {
+  name: "/m/03fp41"
+  id: 64
+  display_name: "potted plant"
+}
+item {
+  name: "/m/03ssj5"
+  id: 65
+  display_name: "bed"
+}
+item {
+  name: "/m/04bcr3"
+  id: 67
+  display_name: "dining table"
+}
+item {
+  name: "/m/09g1w"
+  id: 70
+  display_name: "toilet"
+}
+item {
+  name: "/m/07c52"
+  id: 72
+  display_name: "tv"
+}
+item {
+  name: "/m/01c648"
+  id: 73
+  display_name: "laptop"
+}
+item {
+  name: "/m/020lf"
+  id: 74
+  display_name: "mouse"
+}
+item {
+  name: "/m/0qjjc"
+  id: 75
+  display_name: "remote"
+}
+item {
+  name: "/m/01m2v"
+  id: 76
+  display_name: "keyboard"
+}
+item {
+  name: "/m/050k8"
+  id: 77
+  display_name: "cell phone"
+}
+item {
+  name: "/m/0fx9l"
+  id: 78
+  display_name: "microwave"
+}
+item {
+  name: "/m/029bxz"
+  id: 79
+  display_name: "oven"
+}
+item {
+  name: "/m/01k6s3"
+  id: 80
+  display_name: "toaster"
+}
+item {
+  name: "/m/0130jx"
+  id: 81
+  display_name: "sink"
+}
+item {
+  name: "/m/040b_t"
+  id: 82
+  display_name: "refrigerator"
+}
+item {
+  name: "/m/0bt_c3"
+  id: 84
+  display_name: "book"
+}
+item {
+  name: "/m/01x3z"
+  id: 85
+  display_name: "clock"
+}
+item {
+  name: "/m/02s195"
+  id: 86
+  display_name: "vase"
+}
+item {
+  name: "/m/01lsmm"
+  id: 87
+  display_name: "scissors"
+}
+item {
+  name: "/m/0kmg4"
+  id: 88
+  display_name: "teddy bear"
+}
+item {
+  name: "/m/03wvsk"
+  id: 89
+  display_name: "hair drier"
+}
+item {
+  name: "/m/012xff"
+  id: 90
+  display_name: "toothbrush"
+}
+
